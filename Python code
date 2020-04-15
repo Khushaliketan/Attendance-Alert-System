@@ -1,0 +1,65 @@
+import cv2
+import numpy as np
+
+#for mail with attachment of classroom picture
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+
+#to record time
+import time
+
+import socket
+socket.getaddrinfo('localhost', 8080)
+
+#Sending the mail
+
+fromAddr = "sender_email"
+toAddr = "receiver_email"
+   
+msg = MIMEMultipart()    # instance of MIMEMultipart
+  
+# storing the senders email address   
+msg['From'] = fromAddr 
+  
+# storing the receivers email address  
+msg['To'] = toAddr 
+  
+# storing the subject  
+msg['Subject'] = "Attendance of class at "+str(ts2)
+  
+# string to store the body of the mail 
+body = "Please note attendance between timestamps "+ str(ts1) + " and " + str(ts2) + " is "+str(len(positions))+ "."
+  
+# attach the body with the msg instance 
+msg.attach(MIMEText(body, 'plain')) 
+  
+# open the file to be sent  
+filename = "Classroom.jpg"
+attachment = open("Path/Classroom.jpg", "rb") 
+  
+# instance of MIMEBase and named as p 
+p = MIMEBase('application', 'octet-stream') 
+  
+# To change the payload into encoded form 
+p.set_payload((attachment).read()) 
+  
+# encode into base64 
+encoders.encode_base64(p) 
+   
+p.add_header('Content-Disposition', "attachment; filename= %s" % filename) 
+  
+# attach the instance 'p' to instance 'msg' 
+msg.attach(p) 
+  
+
+s=smtplib.SMTP('smtp.gmail.com', 587)      #creating SMTP session via instance and gmail port number is 587
+s.starttls()     #start tls-transport layer security
+s.login(fromAddr, "Password_of_sender")      #logging into the sender mail ID
+
+text=msg.as_string()
+s.sendmail(fromAddr,toAddr,text)
+
+s.quit()
