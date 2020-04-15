@@ -14,6 +14,33 @@ import time
 import socket
 socket.getaddrinfo('localhost', 8080)
 
+face_model=cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+cap=cv2.VideoCapture(0)                     #captures from computer, can be fed from the cctv
+
+while True:
+    status, photo=cap.read()
+    positions=face_model.detectMultiScale(photo)
+    ts1 = time.asctime(time.localtime(time.time()))           #start timestamp
+    if len(positions)!=0:
+        i=0
+        while i<len(positions):
+            x1=positions[i][0]
+            y1=positions[i][1]
+            x2=x1+positions[i][2]
+            y2=y1+positions[i][3]
+        
+            photo=cv2.rectangle(photo,(x1,y1),(x2,y2),[255,0,0],2)
+            cv2.putText(photo,str(i+1),(50,50),cv2.FONT_ITALIC,1,(255,255,255),2)
+            i=i+1
+    cv2.imwrite("Classroom.jpg",photo)        
+    cv2.imshow('Monitor',photo)
+    if cv2.waitKey(1)==13:      #press enter to break out of the loop
+        break        
+ts2 =  time.asctime(time.localtime(time.time()))       #end timestamp
+cv2.destroyAllWindows()
+cap.release()        
+
 #Sending the mail
 
 fromAddr = "sender_email"
